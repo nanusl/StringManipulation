@@ -36,9 +36,10 @@
 
 
         <group id="StringManipulation.Group.Main" text="String Manipulation"
-               description="String Manipulation Main"
+               description="Group of String manipulation"
                popup="true"
-               icon="/osmedile/intellij/stringmanip/edit.png">
+               icon="/osmedile/intellij/stringmanip/edit.png"
+        >
             <add-to-group group-id="EditMenu" anchor="last"/>
 
             <action id="osmedile.intellij.stringmanip.RepeatAction" class="osmedile.intellij.stringmanip.RepeatAction"
@@ -165,20 +166,15 @@
             <group id="StringManipulation.Group.SwitchCase" text="转换..."
                    description="String Manipulation 转换操作"
                    popup="true">
-                <action id="StringManipulation.SwitchStyleAction"
-                        class="osmedile.intellij.stringmanip.styles.SwitchStyleAction"
-                        text="转换"
-                        description="转换/切换样式 (大小驼峰命名, 大小短横线命名, 大小蛇形命名, 点命名, 大小写单词)">
-                </action>
-                <!--                dynamically registered-->
-                <!--                <action id="StringManipulation.SwitchStyleAction"-->
-                <!--                        class="osmedile.intellij.stringmanip.styles.SwitchStyleAction"-->
-                <!--                        text="Switch case"-->
-                <!--                        description="Switch/Toggle case (camelCase, kebab-lowercase, KEBAB-UPPERCASE, snake_case, SCREAMING_SNAKE_CASE, dot.case, words lowercase,  Normal sentence, Words Capitalized)">-->
-                <!--                </action>-->
+<!--                dynamically registered-->
+<!--                <action id="StringManipulation.SwitchStyleAction"-->
+<!--                        class="osmedile.intellij.stringmanip.styles.SwitchStyleAction"-->
+<!--                        text="转换"-->
+<!--                        description="转换/切换样式 (大小驼峰命名, 大小短横线命名, 大小蛇形命名, 点命名, 大小写单词)">-->
+<!--                </action>-->
                 <separator/>
                 <action id="osmedile.intellij.stringmanip.WordsAndCamelToConstantStyleCaseAction"
-                        class="osmedile.intellij.stringmanip.styles.ToConstantStyleCaseAction"
+                        class="osmedile.intellij.stringmanip.styles.ToScreamingSnakeCaseAction"
                         text="转换为大蛇形命名 (或 驼峰命名)"
                         description="SCREAMING_SNAKE_CASE &lt;-&gt; screamingSnakeCase">
                 </action>
@@ -203,30 +199,26 @@
                         description="dot.case &lt;-&gt; dotCase">
                 </action>
 
-                <action id="osmedile.intellij.stringmanip.ToCamelCaseAction"
-                        class="osmedile.intellij.stringmanip.styles.ToCamelCaseAction"
-                        text="转换为驼峰命名 (或 单词)"
-                        description="camelCase &lt;-&gt; Camel Case">
-                </action>
-                <separator/>
-                <action id="osmedile.intellij.stringmanip.styles.ToCamelCaseOrToWordLowercaseAction"
-                        class="osmedile.intellij.stringmanip.styles.ToCamelCaseOrToWordLowercaseAction"
-                        text="转换为驼峰命名 (或 全小写单词)"
-                        description="camelCase &lt;-&gt; camel case">
-                </action>
                 <action id="StringManipulation.ToPascalCaseOrCamelCase"
                         class="osmedile.intellij.stringmanip.styles.ToPascalCaseAction"
                         text="转换为帕斯卡命名 (或 驼峰命名)"
                         description="PascalCase &lt;-&gt; pascalCase">
+                </action>
+                <separator/>
+                <action id="osmedile.intellij.stringmanip.styles.ToCamelCaseOrToWordLowercaseAction"
+                        class="osmedile.intellij.stringmanip.styles.ToWordLowercaseOrToCamelCaseAction"
+                        text="转换为驼峰命名 (或 全小写单词)"
+                        description="camelCase &lt;-&gt; camel case">
+                </action>
                 <action id="StringManipulation.ToSentenceCaseOrCamelCase"
                         class="osmedile.intellij.stringmanip.styles.ToSentenceCaseOrCamelCaseAction"
-                        text="First word capitalized / camelCase"
-                        description="Toggle: First word capitalized / camelCase">
+                        text="首字母大写 / 驼峰命名"
+                        description="Camel case &lt;-&gt; camelCase">
                 </action>
                 <action id="osmedile.intellij.stringmanip.ToCamelCaseAction"
                         class="osmedile.intellij.stringmanip.styles.ToWordCapitalizedOrCamelCaseAction"
-                        text="Capitalized Words / camelCase"
-                        description="Toggle: Capitalized Words / camelCase">
+                        text="大写单词 / 驼峰命名"
+                        description="Camel Case &lt;-&gt; camelCase">
                 </action>
                 <separator/>
 
@@ -254,7 +246,7 @@
                 <separator/>
                 <action id="StringManipulation.OpenSettingsAction"
                         class="osmedile.intellij.stringmanip.config.OpenSettingsAction"
-                        text="Open settings..."/>
+                        text="打开设置..."/>
             </group>
 
             <separator/>
@@ -417,13 +409,13 @@
 
 
         <group id="StringManipulation.EditorPopupMenu" text="String Manipulation"
-               description="String Manipulation 弹出菜单"
+               description="String Manipulation"
                popup="false"
                icon="/osmedile/intellij/stringmanip/edit.png">
             <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="EditorToggleColumnMode"/>
 
             <separator/>
-            <reference ref="StringManipulation.Group.Main"/>
+            <reference ref="StringManipulation.Group.Main"></reference>
         </group>
 
     </actions>

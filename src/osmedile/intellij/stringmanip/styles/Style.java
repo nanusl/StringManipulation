@@ -7,33 +7,33 @@ import static java.lang.Character.isUpperCase;
 import static osmedile.intellij.stringmanip.utils.StringUtil.*;
 
 public enum Style {
-	KEBAB_LOWERCASE("kebab-case", "foo-bar") {
+	KEBAB_LOWERCASE("小短横线命名", "foo-bar") {
 		@Override
 		public String transform(Style style, String s) {
 			String s1 = wordsAndHyphenAndCamelToConstantCase(s).toLowerCase();
 			return replaceSeparator(s1, '_', '-');
 		}
 	},
-	KEBAB_UPPERCASE("KEBAB-UPPERCASE", "FOO-BAR") {
+	KEBAB_UPPERCASE("大短横线命名", "FOO-BAR") {
 		@Override
 		public String transform(Style style, String s) {
 			String s1 = wordsAndHyphenAndCamelToConstantCase(s);
 			return replaceSeparator(s1, '_', '-');
 		}
 	},
-	SNAKE_CASE("snake_case", "foo_bar") {
+	SNAKE_CASE("小蛇形命名", "foo_bar") {
 		@Override
 		public String transform(Style style, String s) {
 			return wordsAndHyphenAndCamelToConstantCase(s).toLowerCase();
 		}
 	},
-	SCREAMING_SNAKE_CASE("SCREAMING_SNAKE_CASE", "FOO_BAR") {
+	SCREAMING_SNAKE_CASE("大蛇形命名", "FOO_BAR") {
 		@Override
 		public String transform(Style style, String s) {
 			return wordsAndHyphenAndCamelToConstantCase(s);
 		}
 	},
-	PASCAL_CASE("PascalCase", "FooBar", "FooBar") {
+	PASCAL_CASE("帕斯卡命名", "FooBar", "FooBar") {
 		@Override
 		public String transform(Style style, String s) {
 			if (style != CAMEL_CASE) {
@@ -42,7 +42,7 @@ public enum Style {
 			return capitalizeFirstWord2(s);
 		}
 	},
-	CAMEL_CASE("camelCase", "fooBar", "fooBar") {
+	CAMEL_CASE("驼峰命名", "fooBar", "fooBar") {
 		@Override
 		public String transform(Style style, String s) {
 			if (style == CAMEL_CASE) {
@@ -51,21 +51,21 @@ public enum Style {
 			return toCamelCase(s);
 		}
 	},
-	DOT("dot.case", "foo.bar", "foo.Bar") {
+	DOT("点命名", "foo.bar", "foo.Bar") {
 		@Override
 		public String transform(Style style, String s) {
 			String s1 = wordsAndHyphenAndCamelToConstantCase(s).toLowerCase();
 			return replaceSeparator(s1, '_', '.');
 		}
 	},
-	WORD_LOWERCASE("words lowercase", "foo bar") {
+	WORD_LOWERCASE("小写单词", "foo bar") {
 		@Override
 		public String transform(Style style, String s) {
 			String s1 = wordsAndHyphenAndCamelToConstantCase(s).toLowerCase();
 			return replaceSeparator(s1, '_', ' ');
 		}
 	},
-	SENTENCE_CASE("First word capitalized", "Foo bar") {
+	SENTENCE_CASE("首字母大写", "Foo bar") {
 		@Override
 		public String transform(Style style, String s) {
 			if (style != WORD_LOWERCASE) {
@@ -75,7 +75,7 @@ public enum Style {
 			return capitalizeFirstWord(s, Constants.DELIMITERS);
 		}
 	},
-	WORD_CAPITALIZED("Words Capitalized", "Foo Bar") {
+	WORD_CAPITALIZED("大写单词", "Foo Bar") {
 		@Override
 		public String transform(Style style, String s) {
 			if (style != WORD_LOWERCASE && style != WORD_CAPITALIZED) {
@@ -88,7 +88,7 @@ public enum Style {
 	/**
 	 * never use that to transform
 	 */
-	_SINGLE_WORD_CAPITALIZED("<Singlewordcapitalized>", "Foobar") {
+	_SINGLE_WORD_CAPITALIZED("<单词大写>", "Foobar") {
 		@Override
 		public String transform(Style style, String s) {
 			return s;
@@ -97,7 +97,7 @@ public enum Style {
 	/**
 	 * never use that to transform
 	 */
-	_ALL_UPPER_CASE("<ALLUPPERCASE>", "FOOBAR") {
+	_ALL_UPPER_CASE("<全大写>", "FOOBAR") {
 		@Override
 		public String transform(Style style, String s) {
 			return s;
@@ -106,7 +106,7 @@ public enum Style {
 	/**
 	 * never use that to transform
 	 */
-	_UNKNOWN("<unknown>") {
+	_UNKNOWN("<未知>") {
 		@Override
 		public String transform(Style style, String s) {
 			return s;

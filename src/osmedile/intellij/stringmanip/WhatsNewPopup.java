@@ -29,7 +29,7 @@ public class WhatsNewPopup {
 			stateComponent.setVersion(CURRENT_VERSION);
 
 			ApplicationManager.getApplication().invokeLater(() -> {
-				Notification notification = NOTIFICATION.createNotification("String Manipulation popup", "You can now customize 'Switch Case' action or add your own via <a href=\"#\">Settings | Other Settings | String Manipulation</a>", NotificationType.INFORMATION,
+				Notification notification = NOTIFICATION.createNotification("弹出 String Manipulation", "您现在可以自定义“切换案例”操作或添加自己的操作 <a href=\"#\">Settings | Other Settings | String Manipulation</a>", NotificationType.INFORMATION,
 					new NotificationListener.UrlOpeningListener(true) {
 						@Override
 						protected void hyperlinkActivated(@NotNull Notification notification, @NotNull HyperlinkEvent event) {

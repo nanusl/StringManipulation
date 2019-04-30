@@ -95,11 +95,11 @@ public class CustomActionSettingsForm implements Disposable {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String s =
-					"1) the current style of the text is detected" +
-					"\n2) the text is then switched to the next enabled style" +
-					"\n3) some <styles> cannot be enabled, they are here only for edge cases" +
-					"\n\nFeel free to report any issues.";
-				Messages.showInfoMessage(root, s, "How it works");
+					"1) 检测当前文本style" +
+					"\n2) 然后将文本切换到下一个启用的样式" +
+					"\n3) 某些 style 无法启用, 它们仅适用于某些边缘情况" +
+					"\n\n自由提交任何的issues.";
+				Messages.showInfoMessage(root, s, "这个怎么运作");
 			}
 		});
 		initializeModel();
@@ -110,7 +110,7 @@ public class CustomActionSettingsForm implements Disposable {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				CustomActionModel element = CustomActionModel.create();
-				element.setName("New action");
+				element.setName("新动作");
 				model.addElement(element);
 				actionsList.setSelectedValue(element, true);
 				updateWarningVisibility();
