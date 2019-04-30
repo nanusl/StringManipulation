@@ -6,7 +6,7 @@ import org.junit.Test;
 import osmedile.intellij.stringmanip.sort.support.Sort;
 import osmedile.intellij.stringmanip.sort.support.SortLines;
 import osmedile.intellij.stringmanip.sort.support.SortSettings;
-import osmedile.intellij.stringmanip.utils.StringUtils;
+import shaded.org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -1,6 +1,6 @@
 package osmedile.intellij.stringmanip.sort.support;
 
-import osmedile.intellij.stringmanip.utils.StringUtils;
+import shaded.org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
@@ -23,7 +23,7 @@ public class SortLines {
 	protected void initLines(SortSettings sortSettings, List<String> list) {
 		for (int i = 0; i < list.size(); i++) {
 			String s = list.get(i);
-			if (org.apache.commons.lang.StringUtils.isBlank(s)) {
+			if (shaded.org.apache.commons.lang3.StringUtils.isBlank(s)) {
 				if (sortSettings.emptyLines() == SortSettings.BlankLines.PRESERVE) {
 					emptyLines.put(i, s);
 				}
@@ -50,9 +50,9 @@ public class SortLines {
 
 	public List<String> sortLines() {
 		Sort sortType = sortSettings.getSortType();
-		List<SortLine> lines = sortType.sortLines(new ArrayList<SortLine>(this.lines), sortSettings.getComparatorEnum());
+		List<SortLine> lines = sortType.sortLines(this.lines, sortSettings.getBaseComparator(), sortSettings.getCollatorLanguageTag());
 
-		List<String> result = new ArrayList<String>();
+		List<String> result = new ArrayList<>();
 		for (int i = 0; i < lines.size(); i++) {
 			SortLine originalLine = this.lines.get(i);
 			SortLine newLine = lines.get(i);
@@ -64,7 +64,5 @@ public class SortLines {
 			result.add(emptyLine.getKey(), emptyLine.getValue());
 		}
 		return result;
-
-
 	}
 }

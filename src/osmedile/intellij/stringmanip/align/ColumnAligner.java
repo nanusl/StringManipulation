@@ -3,7 +3,7 @@ package osmedile.intellij.stringmanip.align;
 import java.util.ArrayList;
 import java.util.List;
 
-import static osmedile.intellij.stringmanip.utils.StringUtils.isEmpty;
+import static shaded.org.apache.commons.lang3.StringUtils.isEmpty;
 
 public class ColumnAligner {
 	private final ColumnAlignerModel model;
@@ -27,7 +27,7 @@ public class ColumnAligner {
 			}
 			List<ColumnAlignerLine> columnAlignerLines = new ArrayList<ColumnAlignerLine>();
 			for (String line : lines) {
-				columnAlignerLines.add(new ColumnAlignerLine(model, separator, line, false));
+				columnAlignerLines.add(new ColumnAlignerLine(model, line, false, separator));
 			}
 			lines = process(columnAlignerLines);
 		}
@@ -36,17 +36,21 @@ public class ColumnAligner {
 
 	public String align(String text) {
 		String reformat = text;
-		for (String separator : model.getSeparators()) {
-			if (isEmpty(separator)) {
-				continue;
+		if (model.isSequentialProcessing()) {
+			for (String separator : model.getSeparators()) {
+				if (isEmpty(separator)) {
+					continue;
+				}
+				reformat = reformat(reformat, separator);
 			}
-			reformat = reformat(separator, reformat);
+		} else {
+			reformat = reformat(reformat, model.getSeparators().toArray(new String[0]));
 		}
 		return reformat;
 	}
 
-	private String reformat(String separator, String text) {
-		List<ColumnAlignerLine> lines = toLines(separator, text);
+	private String reformat(String text, String... separator) {
+		List<ColumnAlignerLine> lines = toLines(text, separator);
 		List<String> process = process(lines);
 		StringBuilder sb = new StringBuilder();
 		for (String line : process) {
@@ -55,14 +59,14 @@ public class ColumnAligner {
 		return sb.toString();
 	}
 
-	private List<ColumnAlignerLine> toLines(String separator, String text) {
+	private List<ColumnAlignerLine> toLines(String text, String... separator) {
 		List<ColumnAlignerLine> lines = new ArrayList<ColumnAlignerLine>();
 		String[] split = text.split("\n");
 		boolean lastTokenEndsWithNewLine = text.endsWith("\n");
 		for (int i = 0; i < split.length; i++) {
 			String s = split[i];
 			boolean last = i == split.length - 1;
-			lines.add(new ColumnAlignerLine(model, separator, s, last ? lastTokenEndsWithNewLine : true));
+			lines.add(new ColumnAlignerLine(model, s, last ? lastTokenEndsWithNewLine : true, separator));
 		}
 		return lines;
 	}
@@ -76,19 +80,20 @@ public class ColumnAligner {
 		boolean process = true;
 		while (process) {
 			process = false;
-
 			for (ColumnAlignerLine line : lines) {
 				line.appendText();
 			}
 
-
+			for (ColumnAlignerLine line : lines) {
+				line.next();
+			}
 			if (model.getAlignBy() == ColumnAlignerModel.Align.SEPARATORS) {
 				int maxLength = getMaxLength(lines);
 				for (ColumnAlignerLine line : lines) {
 					line.appendSpace(maxLength);
 				}
 			}
-	   
+
 			for (ColumnAlignerLine line : lines) {
 				line.appendSpaceBeforeSeparator();
 			}
@@ -96,19 +101,17 @@ public class ColumnAligner {
 				line.appendSeparator();
 			}
 			for (ColumnAlignerLine line : lines) {
+				line.next();
+			}
+			for (ColumnAlignerLine line : lines) {
 				line.appendSpaceAfterSeparator();
 			}
 
-			if (model.getAlignBy() == ColumnAlignerModel.Align.VALUES) {
 				int maxLength = getMaxLength(lines);
 				for (ColumnAlignerLine line : lines) {
 					line.appendSpace(maxLength);
 				}
-			}
 
-			for (ColumnAlignerLine line : lines) {
-				line.next();
-			}
 
 			for (ColumnAlignerLine line : lines) {
 				process = process || line.hasToken();

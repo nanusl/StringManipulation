@@ -6,7 +6,7 @@ import com.intellij.openapi.editor.SelectionModel;
 import com.intellij.openapi.editor.actionSystem.EditorWriteActionHandler;
 import osmedile.intellij.stringmanip.MyApplicationComponent;
 import osmedile.intellij.stringmanip.MyEditorAction;
-import osmedile.intellij.stringmanip.utils.StringUtils;
+import shaded.org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;

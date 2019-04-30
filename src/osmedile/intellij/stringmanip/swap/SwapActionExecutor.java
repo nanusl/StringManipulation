@@ -37,9 +37,9 @@ public class SwapActionExecutor {
 	public String swapTokens(String separator, String selectedText) {
 		String[] split;
 		if (" ".equals(separator)) {
-			split = org.apache.commons.lang.StringUtils.splitByWholeSeparator(selectedText.trim(), separator);
+			split = shaded.org.apache.commons.lang3.StringUtils.splitByWholeSeparator(selectedText.trim(), separator);
 		} else {
-			split = org.apache.commons.lang.StringUtils.splitByWholeSeparatorPreserveAllTokens(selectedText, separator);
+			split = shaded.org.apache.commons.lang3.StringUtils.splitByWholeSeparatorPreserveAllTokens(selectedText, separator);
 		}
 
 		String[] result = new String[split.length];
@@ -47,7 +47,7 @@ public class SwapActionExecutor {
 		System.arraycopy(split, 0, result, 1, split.length - 1);
 
 		if (" ".equals(separator)) {
-			return org.apache.commons.lang.StringUtils.join(result, separator);
+			return shaded.org.apache.commons.lang3.StringUtils.join(result, separator);
 		} else {
 			StringBuilder sb = new StringBuilder();
 			for (int i = 0; i < result.length; i++) {

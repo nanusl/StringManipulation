@@ -8,7 +8,7 @@ import osmedile.intellij.stringmanip.MyApplicationComponent;
 import osmedile.intellij.stringmanip.MyEditorAction;
 import osmedile.intellij.stringmanip.utils.DuplicatUtils;
 import osmedile.intellij.stringmanip.utils.StringUtil;
-import osmedile.intellij.stringmanip.utils.StringUtils;
+import shaded.org.apache.commons.lang3.StringUtils;
 
 import java.util.concurrent.atomic.AtomicReference;
 

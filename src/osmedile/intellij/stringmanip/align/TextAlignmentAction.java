@@ -3,7 +3,7 @@ package osmedile.intellij.stringmanip.align;
 import org.jetbrains.annotations.NotNull;
 import osmedile.intellij.stringmanip.MultiCaretHandlerHandler;
 import osmedile.intellij.stringmanip.MyEditorAction;
-import osmedile.intellij.stringmanip.utils.StringUtils;
+import shaded.org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,6 +99,6 @@ public abstract class TextAlignmentAction extends MyEditorAction {
 	}
 
 	private static String center(String s) {
-		return org.apache.commons.lang.StringUtils.center(s.trim(), s.length());
+		return shaded.org.apache.commons.lang3.StringUtils.center(s.trim(), s.length());
 	}
 }

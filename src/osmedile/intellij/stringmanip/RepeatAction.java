@@ -37,8 +37,10 @@ public class RepeatAction extends EditorAction {
 		if (anAction != null) {
 			e.getPresentation().setEnabled(true);
 			e.getPresentation().setText("重复 - " + anAction.getTemplatePresentation().getText());
+			e.getPresentation().setDescription(anAction.getTemplatePresentation().getDescription());
 		} else {
 			e.getPresentation().setText("重复最后的操作");
+			e.getPresentation().setDescription(null);
 			e.getPresentation().setEnabled(false);
 		}
 	}

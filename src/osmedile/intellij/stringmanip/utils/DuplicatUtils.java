@@ -2,6 +2,7 @@ package osmedile.intellij.stringmanip.utils;
 
 
 import org.jetbrains.annotations.Nullable;
+import shaded.org.apache.commons.lang3.math.NumberUtils;
 
 /**
  * @author Olivier Smedile

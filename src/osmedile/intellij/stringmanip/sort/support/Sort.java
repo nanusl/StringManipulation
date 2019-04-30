@@ -1,6 +1,7 @@
 package osmedile.intellij.stringmanip.sort.support;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -100,23 +101,25 @@ public enum Sort {
 		this.factory = factory;
 	}
 
-	public <T extends SortLine> List<T> sortLines(List<T> lines, SortSettings.ComparatorEnum comparatorEnum) {
+	public <T extends SortLine> List<T> sortLines(List<T> lines, SortSettings.BaseComparator baseComparator, String languageTag) {
+		List<T> sortedLines = new ArrayList<T>(lines);
 		switch (this) {
 			case SHUFFLE:
-				Collections.shuffle(lines);
+				Collections.shuffle(sortedLines);
 				break;
 			case REVERSE:
-				Collections.reverse(lines);
+				Collections.reverse(sortedLines);
 				break;
 			default:
-				Collections.sort(lines, getComparator(comparatorEnum));
+				Collections.sort(sortedLines, getComparator(baseComparator, languageTag));
 		}
-		return lines;
+		return sortedLines;
 	}
 
-	protected Comparator getComparator(SortSettings.ComparatorEnum comparatorEnum) {
+	protected Comparator getComparator(SortSettings.BaseComparator baseComparatorEnum, String languageTag) {
+		Comparator baseComparator = SortSettings.BaseComparator.getComparator(baseComparatorEnum, languageTag);
 		if (factory != null) {
-			return factory.prototype(comparatorEnum.comparator);
+			return factory.prototype(baseComparator);
 		} else {
 			return comparator;
 		}

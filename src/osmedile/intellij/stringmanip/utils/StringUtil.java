@@ -1,10 +1,18 @@
 package osmedile.intellij.stringmanip.utils;
 
+import org.jetbrains.annotations.NotNull;
+import osmedile.intellij.stringmanip.config.PluginPersistentStateComponent;
+import shaded.org.apache.commons.lang3.CharUtils;
+
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.lang.Character.isWhitespace;
 import static java.lang.Character.*;
+import static shaded.org.apache.commons.lang3.StringUtils.*;
 
 
 /**
@@ -12,17 +20,15 @@ import static java.lang.Character.*;
  * @version $Id: StringUtil.java 62 2008-04-20 11:11:54Z osmedile $
  */
 public class StringUtil {
-	/* V_2V */
-	static boolean separatorBeforeDigit = false;
-	/* V2_V */
-	static boolean separatorAfterDigit = true; // false might not work totally fine e.g. ToHyphenCaseActionTest
+	private static PluginPersistentStateComponent persistentStateComponent;
+	public static final char EMPTY_CHAR = 0;
 
 	public static String removeAllSpace(String s) {
-		return StringUtils.join(s.split("\\s"), "").trim();
+		return join(s.split("\\s"), "").trim();
 	}
 
 	public static String trimAllSpace(String s) {
-		return StringUtils.join(s.split("\\s+"), " ");
+		return join(s.split("\\s+"), " ");
 	}
 
 	public static String camelToText(String s) {
@@ -30,13 +36,11 @@ public class StringUtil {
 		char lastChar = ' ';
 		for (char c : s.toCharArray()) {
 			char nc = c;
-			if (isUpperCase(nc) && !isUpperCase(lastChar)) {
-				if (lastChar != ' ' && isLetterOrDigit(lastChar)) {
-					buf.append(" ");
-				}
+			if (isUpperCase(nc) && isLowerCase(lastChar)) {
+				buf.append(" ");
 				nc = Character.toLowerCase(c);
-			} else if ((separatorAfterDigit && isDigit(lastChar) && !isDigit(c))
-					|| (separatorBeforeDigit && isDigit(c) && !isDigit(lastChar))) {
+			} else if ((isSeparatorAfterDigit() && isDigit(lastChar) && isLetter(c))
+				|| (isSeparatorBeforeDigit() && isDigit(c) && isLetter(lastChar))) {
 				if (lastChar != ' ') {
 					buf.append(" ");
 				}
@@ -51,6 +55,88 @@ public class StringUtil {
 		return buf.toString();
 	}
 
+	/**
+	 * inspired by org.apache.commons.text.WordUtils#capitalize
+	 */
+	public static String capitalizeFirstWord(String str, char[] delimiters) {
+		if (isEmpty(str)) {
+			return str;
+		} else {
+			boolean done = false;
+			Set<Integer> delimiterSet = generateDelimiterSet(delimiters);
+			int strLen = str.length();
+			int[] newCodePoints = new int[strLen];
+			int outOffset = 0;
+			boolean capitalizeNext = true;
+			int index = 0;
+
+			while (index < strLen) {
+				int codePoint = str.codePointAt(index);
+				if (delimiterSet.contains(codePoint)) {
+					capitalizeNext = true;
+					newCodePoints[outOffset++] = codePoint;
+					index += Character.charCount(codePoint);
+				} else if (!done && capitalizeNext && isLowerCase(codePoint)) {
+					int titleCaseCodePoint = Character.toTitleCase(codePoint);
+					newCodePoints[outOffset++] = titleCaseCodePoint;
+					index += Character.charCount(titleCaseCodePoint);
+					capitalizeNext = false;
+					done = true;
+				} else {
+					newCodePoints[outOffset++] = codePoint;
+					index += Character.charCount(codePoint);
+				}
+			}
+
+			return new String(newCodePoints, 0, outOffset);
+		}
+	}
+
+	public static String capitalizeFirstWord2(String str) {
+		if (isEmpty(str)) {
+			return str;
+		} else {
+			StringBuilder buf = new StringBuilder();
+			boolean upperNext = true;
+			char[] chars = str.toCharArray();
+			for (int i = 0; i < chars.length; i++) {
+				char c = chars[i];
+				if (isLetter(c) && upperNext) {
+					buf.append(toUpperCase(c));
+					upperNext = false;
+				} else {
+					if (!isLetterOrDigit(c)) {
+						upperNext = true;
+					}
+					buf.append(c);
+				}
+
+			}
+
+			return buf.toString();
+		}
+	}
+
+	/**
+	 * org.apache.commons.text.WordUtils.generateDelimiterSet
+	 */
+	public static Set<Integer> generateDelimiterSet(char[] delimiters) {
+		Set<Integer> delimiterHashSet = new HashSet();
+		if (delimiters != null && delimiters.length != 0) {
+			for (int index = 0; index < delimiters.length; ++index) {
+				delimiterHashSet.add(Character.codePointAt(delimiters, index));
+			}
+
+			return delimiterHashSet;
+		} else {
+			if (delimiters == null) {
+				delimiterHashSet.add(Character.codePointAt(new char[]{' '}, 0));
+			}
+
+			return delimiterHashSet;
+		}
+	}
+
 	public static String toSoftCamelCase(String s) {
 		String[] words = s.split("[\\s_]");
 
@@ -59,12 +145,12 @@ public class StringUtil {
 			words[i] = com.intellij.openapi.util.text.StringUtil.capitalize(words[i]);
 		}
 
-		return StringUtils.join(words);
+		return join(words);
 	}
 
 
 	public static String toCamelCase(String s) {
-		String[] words = org.apache.commons.lang.StringUtils.splitByCharacterTypeCamelCase(s);
+		String[] words = splitByCharacterTypeCamelCase(s);
 
 		boolean firstWordNotFound = true;
 		for (int i = 0; i < words.length; i++) {
@@ -76,8 +162,11 @@ public class StringUtil {
 				words[i] = com.intellij.openapi.util.text.StringUtil.capitalize(word.toLowerCase());
 			}
 		}
-
-		return StringUtils.join(words).replaceAll("[\\s_]", "");
+		String join = join(words);
+		join = replaceSeparator_keepBetweenDigits(join, '_', EMPTY_CHAR);
+		join = replaceSeparator_keepBetweenDigits(join, '-', EMPTY_CHAR);
+		join = replaceSeparator_keepBetweenDigits(join, '.', EMPTY_CHAR);
+		return join.replaceAll("[\\s]", "");
 	}
 
 	private static boolean startsWithLetter(String word) {
@@ -94,7 +183,7 @@ public class StringUtil {
 		char lastChar = 'a';
 		for (char c : s.toCharArray()) {
 			if (isWhitespace(lastChar) && (!isWhitespace(c) && '_' != c) &&
-					buf.length() > 0 && buf.charAt(buf.length() - 1) != '_') {
+				buf.length() > 0 && buf.charAt(buf.length() - 1) != '_') {
 				buf.append("_");
 			}
 			if (!isWhitespace(c)) {
@@ -135,8 +224,8 @@ public class StringUtil {
 			if (lastOneIsNotUnderscore && (isUpperCaseAndPreviousIsLowerCase || previousIsWhitespace
 				|| (_betweenUpperCases && containsLowerCase && isUpperCaseAndPreviousIsUpperCase))) {
 				buf.append("_");
-			} else if ((separatorAfterDigit && isDigit(previousChar) && isLetter(c))
-				|| (separatorBeforeDigit && isDigit(c) && isLetter(previousChar))) { // extra _ after number
+			} else if ((isSeparatorAfterDigit() && isDigit(previousChar) && isLetter(c))
+				|| (isSeparatorBeforeDigit() && isDigit(c) && isLetter(previousChar))) { // extra _ after number
 				buf.append('_');
 			}
 
@@ -149,9 +238,9 @@ public class StringUtil {
 
 			previousChar = c;
 		}
-		if (isWhitespace(previousChar)) {
-			buf.append("_");
-		}
+//		if (isWhitespace(previousChar)) {
+//			buf.append("_");
+//		}
 
 
 		return buf.toString();
@@ -190,8 +279,8 @@ public class StringUtil {
 			boolean lastOneIsNotUnderscore = buf.length() > 0 && buf.charAt(buf.length() - 1) != '.';
 			if (lastOneIsNotUnderscore && (isUpperCaseAndPreviousIsLowerCase || previousIsWhitespace)) {
 				buf.append(".");
-			} else if ((separatorAfterDigit && isDigit(lastChar) && isLetter(c))
-					|| (separatorBeforeDigit && isDigit(c) && isLetter(lastChar))) {
+			} else if ((isSeparatorAfterDigit() && isDigit(lastChar) && isLetter(c))
+				|| (isSeparatorBeforeDigit() && isDigit(c) && isLetter(lastChar))) {
 				buf.append(".");
 			}
 
@@ -213,6 +302,44 @@ public class StringUtil {
 
 
 		return buf.toString();
+	}
+
+	@NotNull
+	public static String replaceSeparator(String s1, char s, char s2) {
+		return s1.replace(s, s2);
+	}
+
+	@NotNull
+	public static String replaceSeparator_keepBetweenDigits(String s, char from, char to) {
+		StringBuilder buf = new StringBuilder();
+		char lastChar = ' ';
+		char[] charArray = s.toCharArray();
+		for (int i = 0; i < charArray.length; i++) {
+			char c = charArray[i];
+			boolean lastDigit = isDigit(lastChar);
+			boolean nextDigit = nextIsDigit(s, i);
+
+			if (c == from && lastDigit && nextDigit) {
+				buf.append(c);
+			} else if (c == from) {
+				if (to != EMPTY_CHAR) {
+					buf.append(to);
+				}
+			} else {
+				buf.append(c);
+			}
+			lastChar = c;
+		}
+
+		return buf.toString();
+	}
+
+	private static boolean nextIsDigit(String s, int i) {
+		if (i + 1 >= s.length()) {
+			return false;
+		} else {
+			return Character.isDigit(s.charAt(i + 1));
+		}
 	}
 
 	/**
@@ -242,9 +369,9 @@ public class StringUtil {
 		// Add segments before each match found
 		int lastBeforeIdx = 0;
 		while (m.find()) {
-			if (StringUtils.isNotEmpty(m.group())) {
+			if (isNotEmpty(m.group())) {
 				String match = input.subSequence(index, m.start()).toString();
-				if (StringUtils.isNotEmpty(match)) {
+				if (isNotEmpty(match)) {
 					result.add(match);
 				}
 				result.add(input.subSequence(m.start(), m.end()).toString());
@@ -259,7 +386,7 @@ public class StringUtil {
 
 
 		final String remaining = input.subSequence(index, input.length()).toString();
-		if (StringUtils.isNotEmpty(remaining)) {
+		if (isNotEmpty(remaining)) {
 			result.add(remaining);
 		}
 
@@ -293,7 +420,7 @@ public class StringUtil {
 		}
 
 
-		return StringUtils.join(parts);
+		return join(parts);
 	}
 
 	public static String wordsToHyphenCase(String s) {
@@ -301,7 +428,7 @@ public class StringUtil {
 		char lastChar = 'a';
 		for (char c : s.toCharArray()) {
 			if (isWhitespace(lastChar) && (!isWhitespace(c) && '-' != c) && buf.length() > 0
-					&& buf.charAt(buf.length() - 1) != '-') {
+				&& buf.charAt(buf.length() - 1) != '-') {
 				buf.append("-");
 			}
 			if ('_' == c) {
@@ -329,7 +456,7 @@ public class StringUtil {
 	}
 
 	public static int indexOfAnyButWhitespace(String cs) {
-		if (org.apache.commons.lang.StringUtils.isEmpty(cs)) {
+		if (isEmpty(cs)) {
 			return cs.length();
 		}
 		final int csLen = cs.length();
@@ -342,4 +469,19 @@ public class StringUtil {
 		}
 		return cs.length();
 	}
+
+	protected static boolean isSeparatorBeforeDigit() {
+		if (persistentStateComponent == null) {
+			persistentStateComponent = PluginPersistentStateComponent.getInstance();
+		}
+		return persistentStateComponent.getCaseSwitchingSettings().isSeparatorBeforeDigit();
+	}
+
+	protected static boolean isSeparatorAfterDigit() {
+		if (persistentStateComponent == null) {
+			persistentStateComponent = PluginPersistentStateComponent.getInstance();
+		}
+		return persistentStateComponent.getCaseSwitchingSettings().isSeparatorAfterDigit();
+	}
+
 }

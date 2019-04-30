@@ -1,100 +1,94 @@
 package osmedile.intellij.stringmanip.styles;
 
-import osmedile.intellij.stringmanip.utils.StringUtil;
+import java.util.Set;
 
-import static org.apache.commons.lang.WordUtils.capitalize;
+import static java.lang.Character.isLowerCase;
+import static java.lang.Character.isUpperCase;
 import static osmedile.intellij.stringmanip.utils.StringUtil.*;
 
 public enum Style {
-	HYPHEN_LOWERCASE("foo-bar") {
+	KEBAB_LOWERCASE("kebab-case", "foo-bar") {
 		@Override
 		public String transform(Style style, String s) {
-			if (style == HYPHEN_UPPERCASE) {
-				return s.toLowerCase();
-			}
-			if (style == SCREAMING_SNAKE_CASE) {
-				s = s.toLowerCase();
-			}
-			if (style == CAMEL_CASE || style == PASCAL_CASE || style == _UNKNOWN) {
-				s = camelToText(s);
-			}
-			return StringUtil.wordsToHyphenCase(s);
+			String s1 = wordsAndHyphenAndCamelToConstantCase(s).toLowerCase();
+			return replaceSeparator(s1, '_', '-');
 		}
 	},
-	HYPHEN_UPPERCASE("FOO-BAR") {
+	KEBAB_UPPERCASE("KEBAB-UPPERCASE", "FOO-BAR") {
 		@Override
 		public String transform(Style style, String s) {
-			if (style == _ALL_UPPER_CASE) {
-				s = CAMEL_CASE.transform(style, s);
-				style = CAMEL_CASE;
-			}
-			if (style == CAMEL_CASE || style == PASCAL_CASE) {
-				s = camelToText(s);
-			}
-			return StringUtil.wordsToHyphenCase(s).toUpperCase();
+			String s1 = wordsAndHyphenAndCamelToConstantCase(s);
+			return replaceSeparator(s1, '_', '-');
 		}
 	},
-	UNDERSCORE_LOWERCASE("foo_bar") {
+	SNAKE_CASE("snake_case", "foo_bar") {
 		@Override
 		public String transform(Style style, String s) {
 			return wordsAndHyphenAndCamelToConstantCase(s).toLowerCase();
 		}
 	},
-	SCREAMING_SNAKE_CASE("FOO_BAR") {
+	SCREAMING_SNAKE_CASE("SCREAMING_SNAKE_CASE", "FOO_BAR") {
 		@Override
 		public String transform(Style style, String s) {
 			return wordsAndHyphenAndCamelToConstantCase(s);
 		}
 	},
-	PASCAL_CASE("FooBar", "FooBar") {
+	PASCAL_CASE("PascalCase", "FooBar", "FooBar") {
 		@Override
 		public String transform(Style style, String s) {
 			if (style != CAMEL_CASE) {
 				s = CAMEL_CASE.transform(s);
 			}
-			return s.substring(0, 1).toUpperCase() + s.substring(1);
+			return capitalizeFirstWord2(s);
 		}
 	},
-	CAMEL_CASE("fooBar", "fooBar") {
+	CAMEL_CASE("camelCase", "fooBar", "fooBar") {
 		@Override
 		public String transform(Style style, String s) {
 			if (style == CAMEL_CASE) {
 				return s.trim();
 			}
-			s = s.replace("-", "_");
-			s = s.replace(".", "_");
 			return toCamelCase(s);
 		}
 	},
-	DOT("foo.bar", "foo.Bar") {
+	DOT("dot.case", "foo.bar", "foo.Bar") {
 		@Override
 		public String transform(Style style, String s) {
-			return StringUtil.toDotCase(s);
+			String s1 = wordsAndHyphenAndCamelToConstantCase(s).toLowerCase();
+			return replaceSeparator(s1, '_', '.');
 		}
 	},
-	WORD_LOWERCASE("foo bar") {
+	WORD_LOWERCASE("words lowercase", "foo bar") {
 		@Override
 		public String transform(Style style, String s) {
-			if (style == _ALL_UPPER_CASE || style == DOT || style == HYPHEN_LOWERCASE || style == HYPHEN_UPPERCASE || style == UNDERSCORE_LOWERCASE
-				|| style == SCREAMING_SNAKE_CASE) {
-				s = CAMEL_CASE.transform(style, s);
+			String s1 = wordsAndHyphenAndCamelToConstantCase(s).toLowerCase();
+			return replaceSeparator(s1, '_', ' ');
+		}
+	},
+	SENTENCE_CASE("First word capitalized", "Foo bar") {
+		@Override
+		public String transform(Style style, String s) {
+			if (style != WORD_LOWERCASE) {
+				s = WORD_LOWERCASE.transform(style, s);
 			}
-			return camelToText(s);
+
+			return capitalizeFirstWord(s, Constants.DELIMITERS);
 		}
 	},
-	WORD_CAPITALIZED("Foo Bar") {
+	WORD_CAPITALIZED("Words Capitalized", "Foo Bar") {
 		@Override
 		public String transform(Style style, String s) {
 			if (style != WORD_LOWERCASE && style != WORD_CAPITALIZED) {
 				s = WORD_LOWERCASE.transform(style, s);
 			}
-			return capitalize(s, Constants.DELIMITERS);
+//			return WordUtils.capitalize(s, Constants.DELIMITERS);
+			return capitalizeFirstWord2(s);
 		}
 	},
 	/**
 	 * never use that to transform
 	 */
-	_SINGLE_WORD_CAPITALIZED("Foobar") {
+	_SINGLE_WORD_CAPITALIZED("<Singlewordcapitalized>", "Foobar") {
 		@Override
 		public String transform(Style style, String s) {
 			return s;
@@ -103,7 +97,7 @@ public enum Style {
 	/**
 	 * never use that to transform
 	 */
-	_ALL_UPPER_CASE("FOOBAR") {
+	_ALL_UPPER_CASE("<ALLUPPERCASE>", "FOOBAR") {
 		@Override
 		public String transform(Style style, String s) {
 			return s;
@@ -112,53 +106,66 @@ public enum Style {
 	/**
 	 * never use that to transform
 	 */
-	_UNKNOWN() {
+	_UNKNOWN("<unknown>") {
 		@Override
 		public String transform(Style style, String s) {
 			return s;
 		}
-	},;
+	},
+	;
+
 
 	/**
 	 * first one is how it should look after transformation, others are variations which follows the rule
 	 */
 	public String[] example;
+	private String presentableName;
 
-	Style(String... example) {
+	Style(String presentableName, String... example) {
+		this.presentableName = presentableName;
 		this.example = example;
+	}
+
+	public String getPresentableName() {
+		return presentableName;
 	}
 
 	public abstract String transform(Style style, String s);
 
 	public String transform(String s) {
-		return this.transform(from(s), s);
+		Style from = from(s);
+		String transform = this.transform(from, s);
+		return transform;
 	}
 
 	public static Style from(String s) {
-		s = removeBorderQuotes(s);
+		s = removeBorderQuotes(s).trim();
 		boolean underscore = s.contains("_");
 		boolean noUpperCase = noUpperCase(s);
 		boolean noLowerCase = noLowerCase(s);
-		boolean containsOnlyLettersAndDigits = containsOnlyLettersAndDigits(s);
+//		boolean containsOnlyLettersAndDigits = containsOnlyLettersAndDigits(s);
+		boolean noSeparators = noSeparators(s, '.', '-', '_', ' ');
+		boolean noSpecialSeparators = noSeparators(s, '.', '-', '_');
 		boolean containsUpperCase = containsUpperCase(s);
+		boolean noSpace = !s.contains(" ");
 
-		if (underscore && noUpperCase) {
-			return UNDERSCORE_LOWERCASE;
+		if (underscore && noUpperCase && noSpace) {
+			return SNAKE_CASE;
 		}
-		if (underscore && noLowerCase) {
+		if (underscore && noLowerCase && noSpace) {
 			return SCREAMING_SNAKE_CASE;
 		}
 
 		boolean hyphen = s.contains("-");
-		if (hyphen && noUpperCase) {
-			return HYPHEN_LOWERCASE;
+		if (hyphen && noUpperCase && noSpace) {
+			return KEBAB_LOWERCASE;
 		}
-		if (hyphen && noLowerCase) {
-			return HYPHEN_UPPERCASE;
+		if (hyphen && noLowerCase && noSpace) {
+			return KEBAB_UPPERCASE;
 		}
 
 		boolean containsDot = s.contains(".");
-		if (containsDot) {
+		if (containsDot && noSpace) {
 			return DOT;
 		}
 
@@ -167,20 +174,23 @@ public enum Style {
 		}
 
 		boolean startsWithUppercase = startsWithUppercase(s);
-		if (startsWithUppercase && containsOnlyLettersAndDigits && !containsUpperCase(s.substring(1, s.length()))) {
+		if (startsWithUppercase && noSeparators && !containsUpperCase(s.substring(1, s.length()))) {
 			return _SINGLE_WORD_CAPITALIZED;
 		}
-		if (startsWithUppercase && containsOnlyLettersAndDigits) {
+		if (startsWithUppercase && noSeparators) {
 			return PASCAL_CASE;
 		}
-		if (containsUpperCase && containsOnlyLettersAndDigits) {
+		if (containsUpperCase && noSeparators) {
 			return CAMEL_CASE;
 		}
 
-		if (noUpperCase) {
+		if (noUpperCase && noSpecialSeparators) {
 			return WORD_LOWERCASE;
 		}
-		if (startsWithUppercase) {
+		if (isCapitalizedFirstButNotAll(s) && !noSpace) {
+			return SENTENCE_CASE;
+		}
+		if (startsWithUppercase && !noSpace) {
 			return WORD_CAPITALIZED;
 		}
 		return _UNKNOWN;
@@ -191,6 +201,25 @@ public enum Style {
 			if (!Character.isLetterOrDigit(c)) {
 				return false;
 			}
+		}
+		return true;
+	}
+
+
+	private static boolean noSeparators(String str, char... delimiters) {
+		if (str.length() == 0) {
+			return false;
+		}
+		Set<Integer> delimiterSet = generateDelimiterSet(delimiters);
+		int strLen = str.length();
+		int index = 0;
+
+		while (index < strLen) {
+			int codePoint = str.codePointAt(index);
+			if (delimiterSet.contains(codePoint)) {
+				return false;
+			}
+			index += Character.charCount(codePoint);
 		}
 		return true;
 	}
@@ -239,11 +268,58 @@ public enum Style {
 	}
 
 
-	private static boolean startsWithUppercase(String s) {
-		if (s.length() == 0) {
+	static boolean isCapitalizedFirstButNotAll(String str) {
+		if (str.length() == 0) {
 			return false;
 		}
-		return Character.isUpperCase(s.charAt(0));
+		Set<Integer> delimiterSet = generateDelimiterSet(new char[]{' '});
+		int strLen = str.length();
+		int index = 0;
+
+		int firstCapitalizedIndex = -1;
+		boolean someUncapitalized = false;
+		boolean afterSeparatorOrFirst = true;
+		while (index < strLen) {
+			int codePoint = str.codePointAt(index);
+//			char c = str.charAt(index);
+			if (delimiterSet.contains(codePoint)) {
+				afterSeparatorOrFirst = true;
+			} else {
+				if (isLowerCase(codePoint) && afterSeparatorOrFirst) {
+					if (firstCapitalizedIndex == -1) {
+						return false;
+					}
+					someUncapitalized = true;
+					afterSeparatorOrFirst = false;
+				} else if (isUpperCase(codePoint) && afterSeparatorOrFirst) {
+					if (firstCapitalizedIndex == -1) {
+						firstCapitalizedIndex = index;
+					}
+					afterSeparatorOrFirst = false;
+				}
+			}
+			index += Character.charCount(codePoint);
+		}
+		return firstCapitalizedIndex != -1 && someUncapitalized;
+	}
+
+	private static boolean startsWithUppercase(String str) {
+		if (str.length() == 0) {
+			return false;
+		}
+		int strLen = str.length();
+		int index = 0;
+		while (index < strLen) {
+			int codePoint = str.codePointAt(index);
+			if (isLowerCase(codePoint)) {
+				return false;
+			}
+			if (isUpperCase(codePoint)) {
+				return true;
+			}
+			index += Character.charCount(codePoint);
+		}
+		return false;
 	}
 
 	private static class Constants {

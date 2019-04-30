@@ -2,7 +2,7 @@ package osmedile.intellij.stringmanip.sort.support;
 
 import org.junit.Assert;
 import org.junit.Test;
-import osmedile.intellij.stringmanip.utils.StringUtils;
+import shaded.org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 import java.util.Collections;

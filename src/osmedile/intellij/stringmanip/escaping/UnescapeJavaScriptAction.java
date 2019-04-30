@@ -1,7 +1,7 @@
 package osmedile.intellij.stringmanip.escaping;
 
 import osmedile.intellij.stringmanip.AbstractStringManipAction;
-import osmedile.intellij.stringmanip.utils.StringEscapeUtil;
+import shaded.org.apache.commons.text.StringEscapeUtils;
 
 /**
  * @author Olivier Smedile
@@ -9,8 +9,8 @@ import osmedile.intellij.stringmanip.utils.StringEscapeUtil;
  */
 public class UnescapeJavaScriptAction extends AbstractStringManipAction {
 
-	@Override
+	@Override                                                                         
 	public String transformByLine(String s) {
-        return StringEscapeUtil.unescapeJavaScript(s);
+		return StringEscapeUtils.unescapeEcmaScript(s);
     }
-}
+}                                                                            

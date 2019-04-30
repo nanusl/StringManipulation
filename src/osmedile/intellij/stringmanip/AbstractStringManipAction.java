@@ -7,7 +7,7 @@ import com.intellij.openapi.editor.SelectionModel;
 import com.intellij.openapi.util.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import osmedile.intellij.stringmanip.utils.StringUtils;
+import shaded.org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Olivier Smedile
@@ -15,6 +15,8 @@ import osmedile.intellij.stringmanip.utils.StringUtils;
  */
 public abstract class AbstractStringManipAction<T> extends MyEditorAction {
 
+	protected final boolean setupHandler;
+	
 	protected AbstractStringManipAction() {
 		this(true);
 	}
@@ -36,6 +38,7 @@ public abstract class AbstractStringManipAction<T> extends MyEditorAction {
 
 			});
 		}
+		this.setupHandler = setupHandler;
 	}
 
 	@NotNull
