@@ -1,6 +1,10 @@
 package osmedile.intellij.stringmanip.align;
 
+import com.google.common.base.Joiner;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -338,12 +342,12 @@ public class AlignToColumnsActionTest {
 	public void test18() {
 		// @formatter:off
 		String notFormattedText =
-"            <li>Convert diacritics(accents) to ASCII</li>\n" +
-"            <li>Convert non ASCII to escaped Unicode</li>";
+"            <li>Convert diacritics (accents) to ASCII</li>\n" +
+"            <li>Convert non-ASCII to escaped Unicode</li>";
 
 		String expectedText =
-			"< li > Convert diacritics(accents) to    ASCII < /li     >\n" +
-			"< li > Convert non                 ASCII to      escaped  Unicode < /li >";
+			"< li > Convert diacritics (accents) to      ASCII   < /li >\n" +
+			"< li > Convert non-ASCII  to        escaped Unicode < /li >";
 		// @formatter:on
 
 
@@ -386,5 +390,54 @@ public class AlignToColumnsActionTest {
 		System.out.println(process);
 
 		assertThat(process, is(expectedText));
+	}
+
+	@Test
+	public void test20() {
+		// @formatter:off
+		String notFormattedText =
+"foo bar\n" +
+"foo bar" ;
+
+String expectedText =
+"foo bar\n" +
+"foo bar" ;
+
+		// @formatter:on
+
+
+		ColumnAlignerModel columnAlignerModel = new ColumnAlignerModel("");
+		String process = new ColumnAligner(columnAlignerModel).align(notFormattedText);
+		assertThat(process, is(expectedText));
+	}
+
+	@Test
+	public void test21() {
+		// @formatter:off
+		               
+		List<String> lines = new ArrayList<>();
+		lines.add("1|2|3|4|5|");
+		lines.add("1-2-3-4-5-");
+		
+		
+		
+		String expectedText =
+			"1 | 2 | 3 | 4 | 5 |\n" +
+			"1 - 2 - 3 - 4 - 5 -";
+		// @formatter:on
+
+
+		ColumnAlignerModel columnAlignerModel = new ColumnAlignerModel("|", "-");
+		List<String> align = new ColumnAligner(columnAlignerModel).align(lines);
+		String join = Joiner.on("\n").join(align);
+
+		System.out.println("INPUT >>>>>>>>>>>");
+		System.out.println(Joiner.on("\n").join(lines));
+		System.out.println("EXPECTED >>>>>>>>>>>");
+		System.out.println(expectedText);
+		System.out.println("RESULT >>>>>>>>>>>");
+		System.out.println(join);
+
+		assertThat(join, is(expectedText));
 	}
 }

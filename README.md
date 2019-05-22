@@ -42,11 +42,12 @@ Provides actions for text manipulation:
             <li>Un/Escape selected Java text</li>
             <li>Un/Escape selected JavaScript text</li>
             <li>Un/Escape selected HTML text</li>
+            <li>Un/Escape selected JSON text</li>
             <li>Un/Escape selected XML text</li>
             <li>Un/Escape selected SQL text</li>
             <li>Un/Escape selected PHP text</li>
-            <li>Convert diacritics(accents) to ASCII</li>
-            <li>Convert non ASCII to escaped Unicode</li>
+            <li>Convert diacritics (accents) to ASCII</li>
+            <li>Convert non-ASCII to escaped Unicode</li>
             <li>Convert escaped Unicode to String</li>
         </ul>
     </p>
