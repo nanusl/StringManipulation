@@ -87,12 +87,12 @@
                 </action>
                 <action id="osmedile.intellij.stringmanip.EscapeJsonAction"
                         class="osmedile.intellij.stringmanip.escaping.EscapeJsonAction"
-                        text="Escape JSON"
+                        text="转义 JSON"
                         description="org.apache.commons.text.StringEscapeUtils#escapeJson">
                 </action>
                 <action id="osmedile.intellij.stringmanip.UnescapeJsonAction"
                         class="osmedile.intellij.stringmanip.escaping.UnescapeJsonAction"
-                        text="Unescape JSON"
+                        text="反转义 JSON"
                         description="org.apache.commons.text.StringEscapeUtils#unescapeJson">
                 </action>
                 <action id="osmedile.intellij.stringmanip.EscapeXMLAction"
